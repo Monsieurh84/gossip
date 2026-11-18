@@ -40,7 +40,7 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(251,246,243,.92);ba
 .hd nav a:hover::after{right:0}
 .hd nav a.promo{color:var(--hot)}
 .logo{display:flex;justify-content:center}
-.logo img{height:38px;width:auto;mix-blend-mode:multiply}
+.logo img{height:74px;width:auto;mix-blend-mode:multiply;margin:-8px 0}
 .logo .txt{font-family:var(--display);font-size:30px;letter-spacing:.02em}
 .icons{display:flex;justify-content:flex-end;gap:6px;align-items:center}
 .ib{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;position:relative;transition:background .2s}
@@ -49,7 +49,7 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(251,246,243,.92);ba
 .badge[hidden]{display:none}
 .badge{position:absolute;top:4px;right:3px;min-width:18px;height:18px;border-radius:9px;background:var(--hot);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px}
 .burger{display:none}
-@media(max-width:1180px){.hd nav{display:none}.burger{display:grid}.hd{grid-template-columns:auto 1fr auto}.logo img{height:30px}}
+@media(max-width:1180px){.hd nav{display:none}.burger{display:grid}.hd{grid-template-columns:auto 1fr auto}.logo img{height:58px;margin:-6px 0}}
 
 /* hero */
 .hero{padding:44px 0 70px;position:relative}
@@ -459,7 +459,7 @@ footer{background:var(--ink);color:#cbbfc4;padding:70px 0 30px}
   <div class="wrap">
     <div class="ft">
       <div>
-        <div class="big">GOSSIP</div>
+        <img src="img/2025/12/telechargement-1.png" alt="GOSSIP" style="height:96px;width:auto;filter:invert(1);mix-blend-mode:screen;margin:-14px 0 -10px -10px">
         <p style="margin-top:14px;max-width:300px">Vêtements et chaussures femme. Boutique à Plan de Campagne, livraison France, Belgique et Suisse.</p>
         <div class="socials"><a href="#">IG</a><a href="#">TT</a><a href="#">FB</a><a href="#">SC</a></div>
       </div>
@@ -524,7 +524,11 @@ const P=[
 const img=p=>U+p.i;
 const eur=v=>v.toFixed(2).replace('.',',')+' €';
 const $=s=>document.querySelector(s);
-let cart=[],wish=new Set(),filter='Tout',shown=8;
+let wish=new Set(),filter='Tout',shown=8;
+const CK='gossip_cart';let cart=[];try{cart=JSON.parse(localStorage.getItem(CK)||'[]')}catch(e){}
+function saveCart(){try{localStorage.setItem(CK,JSON.stringify(cart))}catch(e){}}
+const SLUG={};fetch('data/products.json').then(r=>r.json()).then(d=>d.forEach(x=>{if(x.src0)SLUG[x.src0.split('/uploads/')[1]]=x.slug})).catch(()=>{});
+function go(id){const p=P.find(x=>x.id===id),s=SLUG[p.i];s?location.href='product.html?p='+s:openP(id)}
 
 // tickers
 const tk=['Livraison France · Belgique · Suisse','Nouveautés chaque semaine','Précommandes ouvertes','Click & collect à Plan de Campagne','Paiement en 3x / 4x'];
@@ -544,7 +548,7 @@ function list(){return P.filter(p=>filter==='Tout'||(filter==='Précommandes'?p.
 function card(p){
  const t=[p.pre?`<span class="tag pre">Préco · ${p.pre.replace('Livraison le ','')}</span>`:'',p.nw?'<span class="tag new">Nouveau</span>':'',p.out?'<span class="tag out">Sold out</span>':''].join('');
  return `<article class="pc ${p.out?'soldout':''}">
-  <div class="ph" onclick="openP(${p.id})"><img loading="lazy" src="${img(p)}" alt="${p.n}"><div class="tags">${t}</div>
+  <div class="ph" onclick="go(${p.id})"><img loading="lazy" src="${img(p)}" alt="${p.n}"><div class="tags">${t}</div>
   ${p.out?'':`<div class="quick" onclick="event.stopPropagation()"><p>Ajout rapide</p><div class="sizes">${['XS','S','M','L'].map(s=>`<button onclick="add(${p.id},'${s}')">${s}</button>`).join('')}</div></div>`}</div>
   <button class="heart ${wish.has(p.id)?'on':''}" onclick="toggleW(${p.id},this)" aria-label="Ajouter à mes envies"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
   <div class="meta"><h3>${p.n}</h3><span class="pr">${eur(p.p)}</span></div>
@@ -573,16 +577,17 @@ $('#feed').innerHTML=FE.map(f=>`<a href="#"><img loading="lazy" src="${U+f}" alt
 function toggleW(id,el){wish.has(id)?wish.delete(id):wish.add(id);el.classList.toggle('on');const w=$('#wcount');w.hidden=!wish.size;w.textContent=wish.size;if(wish.has(id))toast('Ajouté à tes envies ♡')}
 
 // cart
-function add(id,size,silent){const p=P.find(x=>x.id===id);if(p.out)return;const k=id+'-'+size;const f=cart.find(c=>c.k===k);f?f.q++:cart.push({k,id,size,q:1});renderCart();if(!silent){toast(p.n+' · taille '+size+' ajouté');openCart()}}
-function chg(k,d){const f=cart.find(c=>c.k===k);f.q+=d;if(f.q<1)cart=cart.filter(c=>c.k!==k);renderCart()}
+function add(id,size,silent){const p=P.find(x=>x.id===id);if(p.out)return;addItem({slug:SLUG[p.i]||'',n:p.n,p:p.p,img:img(p),size,pre:p.pre||''},silent)}
+function addItem(it,silent){const k=(it.slug||it.n)+'-'+it.size;const f=cart.find(c=>c.k===k);f?f.q++:cart.push({...it,k,q:1});saveCart();renderCart();if(!silent){toast(it.n+' · taille '+it.size+' ajouté');openCart()}}
+function chg(k,d){const f=cart.find(c=>c.k===k);f.q+=d;if(f.q<1)cart=cart.filter(c=>c.k!==k);saveCart();renderCart()}
 function renderCart(){
- const tot=cart.reduce((s,c)=>s+P.find(x=>x.id===c.id).p*c.q,0),n=cart.reduce((s,c)=>s+c.q,0);
+ const tot=cart.reduce((s,c)=>s+c.p*c.q,0),n=cart.reduce((s,c)=>s+c.q,0);
  const cc=$('#ccount');cc.hidden=!n;cc.textContent=n;
  $('#total').textContent=eur(tot);
  const left=Math.max(0,69-tot);
  $('#shipTxt').innerHTML=left>0?`Plus que <b>${eur(left)}</b> pour la livraison offerte ✦`:'<b>Livraison offerte</b> débloquée ✦';
  $('#shipBar').style.width=Math.min(100,tot/69*100)+'%';
- $('#items').innerHTML=cart.length?cart.map(c=>{const p=P.find(x=>x.id===c.id);return `<div class="ci"><img src="${img(p)}" alt=""><div><h5>${p.n}</h5><small>Taille ${c.size}${p.pre?' · '+p.pre:''}</small><br><div class="qty"><button onclick="chg('${c.k}',-1)">−</button><span>${c.q}</span><button onclick="chg('${c.k}',1)">+</button></div></div><b>${eur(p.p*c.q)}</b></div>`}).join(''):'<div class="empty"><div class="hand">rien à raconter…</div><p>Ton panier est vide pour l\'instant.</p></div>';
+ $('#items').innerHTML=cart.length?cart.map(c=>`<div class="ci"><img src="${c.img}" alt=""><div><h5>${c.n}</h5><small>Taille ${c.size}${c.pre?' · Préco '+c.pre:''}</small><br><div class="qty"><button onclick="chg('${c.k}',-1)">−</button><span>${c.q}</span><button onclick="chg('${c.k}',1)">+</button></div></div><b>${eur(c.p*c.q)}</b></div>`).join(''):'<div class="empty"><div class="hand">rien à raconter…</div><p>Ton panier est vide pour l\'instant.</p></div>';
 }
 renderCart();
 
