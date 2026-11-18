@@ -40,12 +40,13 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(251,246,243,.92);ba
 .hd nav a:hover::after{right:0}
 .hd nav a.promo{color:var(--hot)}
 .logo{display:flex;justify-content:center}
-.logo img{height:38px;width:auto}
+.logo img{height:38px;width:auto;mix-blend-mode:multiply}
 .logo .txt{font-family:var(--display);font-size:30px;letter-spacing:.02em}
 .icons{display:flex;justify-content:flex-end;gap:6px;align-items:center}
 .ib{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;position:relative;transition:background .2s}
 .ib:hover{background:var(--blush)}
 .ib svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7}
+.badge[hidden]{display:none}
 .badge{position:absolute;top:4px;right:3px;min-width:18px;height:18px;border-radius:9px;background:var(--hot);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px}
 .burger{display:none}
 @media(max-width:1180px){.hd nav{display:none}.burger{display:grid}.hd{grid-template-columns:auto 1fr auto}.logo img{height:30px}}
