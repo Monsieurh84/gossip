@@ -286,7 +286,7 @@ footer{background:var(--ink);color:#cbbfc4;padding:70px 0 30px}
 .mnav.on{transform:none}
 .mnav a{font-family:var(--display);font-size:30px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);background:var(--ink);color:#fff;padding:14px 22px;border-radius:40px;font-weight:700;font-size:14px;z-index:120;transition:transform .4s cubic-bezier(.2,.8,.2,1);display:flex;gap:10px;align-items:center}
-.toast.on{transform:translate(-50%,0)}
+.toast{visibility:hidden}.toast.on{transform:translate(-50%,0);visibility:visible}
 .toast i{width:10px;height:10px;border-radius:50%;background:var(--pink)}
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .9s,transform .9s cubic-bezier(.2,.8,.2,1)}
 .reveal.in{opacity:1;transform:none}
